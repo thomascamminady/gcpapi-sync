@@ -270,7 +270,7 @@ wheels = [
 
 [[package]]
 name = "gcpapi-sync"
-version = "0.1.0"
+version = "0.1.20261022"
 source = { editable = "." }
 dependencies = [
     { name = "anyio" },

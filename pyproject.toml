@@ -1,6 +1,6 @@
 [project]
 name = "gcpapi-sync"
-version = "0.1.0"
+version = "0.1.20261022"
 description = "Typed sync and async Python client for the Garmin Connect Personal API."
 readme = "README.md"
 license = "MIT"

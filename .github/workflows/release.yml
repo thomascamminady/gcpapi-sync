@@ -1,24 +1,62 @@
 name: Release
 
-# Push a tag like v0.2.0 (matching the version in pyproject.toml) to publish:
-#  1. build the sdist and wheel from a clean state and test them,
-#  2. upload them to PyPI with trusted publishing (no API token; the "pypi"
-#     environment is registered as a trusted publisher on pypi.org),
-#  3. attach the same files to a GitHub release.
+# Every new version that reaches main is released. When pyproject.toml on main
+# carries a version without a v<version> tag (bump it with scripts/bump_version.py),
+# this workflow
+#  1. builds the sdist and wheel from a clean state and tests them,
+#  2. uploads them to PyPI with trusted publishing (no API token; PyPI trusts this
+#     workflow in the "pypi" environment, which only deploys from main),
+#  3. creates the tag and a GitHub release with the same files.
 
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths: [pyproject.toml]
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 env:
   UV_LOCKED: "1"
 
 jobs:
+  check:
+    name: Is this version new?
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.decide.outputs.version }}
+      release: ${{ steps.decide.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+      - id: decide
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if git rev-parse --quiet --verify "refs/tags/v${version}" > /dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::v${version} is already released."
+          elif curl --silent --fail --output /dev/null "https://pypi.org/pypi/gcpapi-sync/${version}/json"; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::${version} is on PyPI but has no git tag."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Releasing ${version}."
+          fi
+
   build:
     name: Build and test the distribution
+    needs: check
+    if: needs.check.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -28,10 +66,6 @@ jobs:
         with:
           enable-cache: false # never restore caches when building release artifacts
       - run: uv sync
-      - name: The tag must match the package version
-        run: |
-          version=$(uv version --short)
-          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != v${version}"; exit 1; }
       - run: uv run pytest -q
       - run: uv build
       - name: Check the distribution
@@ -48,7 +82,8 @@ jobs:
 
   pypi:
     name: Publish to PyPI
-    needs: build
+    needs: [check, build]
+    if: needs.check.outputs.release == 'true'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -63,8 +98,9 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
   github-release:
-    name: GitHub release
-    needs: pypi
+    name: Tag and GitHub release
+    needs: [check, pypi]
+    if: needs.check.outputs.release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -73,7 +109,11 @@ jobs:
         with:
           name: dist
           path: dist/
-      - name: Publish the GitHub release
+      - name: Create the tag and release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes
+          VERSION: ${{ needs.check.outputs.version }}
+        run: >-
+          gh release create "v${VERSION}" dist/*
+          --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
+          --title "v${VERSION}" --generate-notes

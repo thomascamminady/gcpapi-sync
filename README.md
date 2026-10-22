@@ -267,6 +267,15 @@ documentation (verified against the live API in October 2026):
 - `GET /weight-service/weight/all/...` answers HTTP 400 for every input.
 - Activity downloads require `Accept: application/x-zip-compressed`.
 
+## Versioning
+
+Versions are `0.MINOR.YYYYMMDD`. `MINOR` grows when this package changes (features,
+fixes); the date records when the current state of Garmin's API was picked up and
+changes only when Garmin changes something. So `0.1.20261022` is followed by
+`0.1.20261029` if Garmin changes its API the next week, and by `0.2.20261022` if this
+package gets a new feature first. Releases are automatic: every new version merged to
+`main` is published to PyPI.
+
 ## Development
 
 ```bash

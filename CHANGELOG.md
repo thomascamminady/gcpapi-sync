@@ -1,12 +1,13 @@
 # Changelog
 
 All notable changes to this project are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres to
-[Semantic Versioning](https://semver.org/).
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+Versions are `0.MINOR.YYYYMMDD`: `MINOR` is bumped when this package changes, and the
+date records when the current state of Garmin's API was picked up (it changes only
+when Garmin changes something). `scripts/bump_version.py` computes the next version.
 
-## [0.1.0] - 2026-10-22
+## [0.1.20261022] - 2026-10-22
 
 ### Added
 
