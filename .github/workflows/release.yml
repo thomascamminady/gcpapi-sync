@@ -1,0 +1,38 @@
+name: Release
+
+# Push a tag like v0.2.0 to build the package and attach it to a GitHub release.
+# Publishing to PyPI is deliberately not configured yet (see CONTRIBUTING.md).
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  UV_LOCKED: "1"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: false # never restore caches when building release artifacts
+      - run: uv sync
+      - name: The tag must match the package version
+        run: |
+          version=$(uv version --short)
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != v${version}"; exit 1; }
+      - run: uv run pytest -q
+      - run: uv build
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes

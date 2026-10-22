@@ -1,0 +1,90 @@
+{
+  "activityId": 40616954664,
+  "activityUUID": {
+    "uuid": "00000000-0000-4000-8000-000000000000"
+  },
+  "activityName": "redacted",
+  "userProfileId": 22758278,
+  "isMultiSportParent": false,
+  "activityTypeDTO": {
+    "typeId": 15,
+    "typeKey": "strength_training",
+    "parentTypeId": 62
+  },
+  "eventTypeDTO": {
+    "typeId": 9,
+    "typeKey": "uncategorized"
+  },
+  "accessControlRuleDTO": {
+    "typeId": 2,
+    "typeKey": "private"
+  },
+  "timeZoneUnitDTO": {
+    "timeZone": "redacted"
+  },
+  "metadataDTO": {
+    "isOriginal": true,
+    "fileFormat": {
+      "formatId": 7,
+      "formatKey": "redacted"
+    },
+    "lastUpdateDate": "2026-01-15T08:00:00.0",
+    "uploadedDate": "2026-01-15T08:00:00.0",
+    "videoUrl": null,
+    "userInfoDto": {
+      "userProfilePk": 42696221,
+      "displayname": "00000000-0000-4000-8000-000000000000",
+      "fullname": "redacted",
+      "profileImageUrlLarge": "https://example.invalid/redacted",
+      "profileImageUrlMedium": "https://example.invalid/redacted",
+      "profileImageUrlSmall": "https://example.invalid/redacted",
+      "userPro": false
+    },
+    "childIds": [],
+    "childActivityTypes": [],
+    "sensors": null,
+    "activityImages": [],
+    "manufacturer": "GARMIN",
+    "lapCount": 1,
+    "hasRunPowerWindData": null,
+    "calendarEventInfo": null,
+    "hasMultiDayActivities": false,
+    "elevationCorrected": false,
+    "runPowerWindDataEnabled": null,
+    "autoCalcCalories": false,
+    "favorite": false,
+    "manualActivity": false,
+    "trimmed": false,
+    "personalRecord": false,
+    "gcj02": false
+  },
+  "summaryDTO": {
+    "startTimeLocal": "2026-01-15T08:00:00.0",
+    "startTimeGMT": "2026-01-15T08:00:00.0",
+    "distance": 0.0,
+    "duration": 1271.6,
+    "movingDuration": 1185.6,
+    "elapsedDuration": 1613.1,
+    "averageSpeed": 0.0,
+    "averageMovingSpeed": 0.0,
+    "calories": 148.2,
+    "bmrCalories": 66.5,
+    "averageHR": 95.0,
+    "maxHR": 171.9,
+    "minHR": 76.8,
+    "trainingEffect": 1.2,
+    "anaerobicTrainingEffect": 0.6,
+    "aerobicTrainingEffectMessage": "MINOR_AEROBIC_BENEFIT_6",
+    "anaerobicTrainingEffectMessage": "NO_ANAEROBIC_BENEFIT_0",
+    "totalExerciseReps": 0,
+    "activeSets": 1,
+    "waterEstimated": 158.8,
+    "trainingEffectLabel": "AEROBIC_BASE",
+    "activityTrainingLoad": 10.5,
+    "minActivityLapDuration": 1376.8,
+    "moderateIntensityMinutes": 1,
+    "vigorousIntensityMinutes": 0,
+    "steps": 0,
+    "differenceBodyBattery": -5
+  }
+}

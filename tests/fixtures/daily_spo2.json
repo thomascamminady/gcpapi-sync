@@ -1,0 +1,81 @@
+{
+  "userProfilePK": 79503654,
+  "calendarDate": "2026-01-15",
+  "startTimestampGMT": "2026-01-15T08:00:00.0",
+  "endTimestampGMT": "2026-01-15T08:00:00.0",
+  "startTimestampLocal": "2026-01-15T08:00:00.0",
+  "endTimestampLocal": "2026-01-15T08:00:00.0",
+  "sleepStartTimestampGMT": "2026-01-15T08:00:00.0",
+  "sleepEndTimestampGMT": "2026-01-15T08:00:00.0",
+  "sleepStartTimestampLocal": "2026-01-15T08:00:00.0",
+  "sleepEndTimestampLocal": "2026-01-15T08:00:00.0",
+  "tomorrowSleepStartTimestampGMT": null,
+  "tomorrowSleepEndTimestampGMT": null,
+  "tomorrowSleepStartTimestampLocal": null,
+  "tomorrowSleepEndTimestampLocal": null,
+  "averageSpO2": null,
+  "lowestSpO2": null,
+  "lastSevenDaysAvgSpO2": null,
+  "latestSpO2": null,
+  "latestSpO2TimestampGMT": null,
+  "latestSpO2TimestampLocal": null,
+  "avgSleepSpO2": null,
+  "avgTomorrowSleepSpO2": null,
+  "spO2SingleValuesDescriptorList": null,
+  "spO2SingleValues": null,
+  "spO2HourlyAveragesDescriptorList": [
+    {
+      "spo2ValueDescIndex": 0,
+      "spo2ValueDescKey": "timestamp"
+    },
+    {
+      "spo2ValueDescIndex": 1,
+      "spo2ValueDescKey": "spo2Level"
+    },
+    {
+      "spo2ValueDescIndex": 2,
+      "spo2ValueDescKey": "monitoringEnvironmentLevel"
+    }
+  ],
+  "spO2HourlyAverages": [
+    [
+      1768464060000,
+      null,
+      60.2
+    ],
+    [
+      1768464120000,
+      null,
+      60.2
+    ],
+    [
+      1768464180000,
+      null,
+      60.2
+    ]
+  ],
+  "monitoringEnvironmentValuesDescriptorList": [
+    {
+      "monEnvValueDescIndex": 0,
+      "monEnvValueDescKey": "timestamp"
+    },
+    {
+      "monEnvValueDescIndex": 1,
+      "monEnvValueDescKey": "monitoringEnvironmentLevel"
+    }
+  ],
+  "monitoringEnvironmentValues": [
+    [
+      1768464240000,
+      71.2
+    ],
+    [
+      1768464300000,
+      71.2
+    ],
+    [
+      1768464360000,
+      71.2
+    ]
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "displayName": "00000000-0000-4000-8000-000000000000",
+  "preferredLocale": "redacted",
+  "measurementSystem": "metric",
+  "firstDayOfWeek": {
+    "dayId": 3,
+    "dayName": "redacted",
+    "sortOrder": 3,
+    "isPossibleFirstDay": true
+  },
+  "numberFormat": "redacted",
+  "timeFormat": {
+    "formatId": 23,
+    "formatKey": "redacted",
+    "minFraction": 0,
+    "maxFraction": 0,
+    "groupingUsed": false,
+    "displayFormat": "redacted"
+  },
+  "dateFormat": {
+    "formatId": 62,
+    "formatKey": "redacted",
+    "minFraction": 0,
+    "maxFraction": 0,
+    "groupingUsed": false,
+    "displayFormat": "redacted"
+  },
+  "powerFormat": {
+    "formatId": 12,
+    "formatKey": "redacted",
+    "minFraction": 0,
+    "maxFraction": 0,
+    "groupingUsed": true,
+    "displayFormat": null
+  },
+  "heartRateFormat": {
+    "formatId": 49,
+    "formatKey": "redacted",
+    "minFraction": 0,
+    "maxFraction": 0,
+    "groupingUsed": false,
+    "displayFormat": null
+  },
+  "timeZone": "redacted",
+  "hydrationMeasurementUnit": "redacted",
+  "hydrationContainers": [
+    {
+      "name": "redacted",
+      "volume": 813,
+      "unit": "redacted"
+    },
+    {
+      "name": "redacted",
+      "volume": 225,
+      "unit": "redacted"
+    },
+    {
+      "name": "redacted",
+      "volume": 382,
+      "unit": "redacted"
+    }
+  ],
+  "golfDistanceUnit": "redacted",
+  "golfElevationUnit": null,
+  "golfSpeedUnit": null,
+  "availableTrainingDays": null,
+  "preferredLongTrainingDays": null
+}

@@ -1,0 +1,148 @@
+name: API drift
+
+# Detects changes to Garmin's Personal API:
+#  * spec:  regenerates the models from Garmin's published OpenAPI document and opens
+#           a pull request when anything changed.
+#  * live:  runs the live tests (needs the GARMIN_PERSONAL_API_KEY repository secret)
+#           and opens an issue when the real API no longer matches the models.
+
+on:
+  schedule:
+    - cron: "23 5 * * 1" # Mondays 05:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-drift
+  cancel-in-progress: false
+
+env:
+  UV_LOCKED: "1"
+
+jobs:
+  spec:
+    name: Compare with Garmin's published spec
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+      - run: uv sync
+
+      - name: Regenerate models from the live spec
+        run: uv run scripts/generate_models.py | tee "$RUNNER_TEMP/generate.log"
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes in Garmin's spec."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat | tee "$RUNNER_TEMP/diffstat.txt"
+          fi
+
+      - name: Run every check against the regenerated code
+        id: checks
+        if: steps.diff.outputs.changed == 'true'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            uv run ruff format --check . &&
+            uv run ruff check . &&
+            uv run ty check &&
+            uv run mypy &&
+            uv run pytest -q
+          } 2>&1 | tee "$RUNNER_TEMP/checks.log"
+
+      - name: Describe the change
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          OUTCOME: ${{ steps.checks.outcome }}
+        run: |
+          {
+            echo "Garmin's published OpenAPI document changed. This pull request regenerates"
+            echo "\`src/gcpapi_sync/models/_generated.py\` and \`spec/endpoints.json\`."
+            echo
+            echo "**Checks on the regenerated code: ${OUTCOME}**"
+            echo
+            echo "### Files"
+            echo '```'
+            cat "$RUNNER_TEMP/diffstat.txt"
+            echo '```'
+            echo "### Generator warnings"
+            echo '```'
+            grep '^warning:' "$RUNNER_TEMP/generate.log" || echo "none"
+            echo '```'
+            echo "### Check output (last 80 lines)"
+            echo '```'
+            tail -n 80 "$RUNNER_TEMP/checks.log"
+            echo '```'
+            echo
+            echo "Review the model changes, update corrections in \`scripts/generate_models.py\`,"
+            echo "wrap any new endpoint in both clients, then add a CHANGELOG entry."
+          } > "$RUNNER_TEMP/body.md"
+
+      - name: Open or update the pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: automation/api-drift
+          delete-branch: true
+          title: "Garmin's Personal API spec changed"
+          commit-message: "Regenerate models from Garmin's current OpenAPI document"
+          body-path: ${{ runner.temp }}/body.md
+          labels: api-drift
+
+  live:
+    name: Check the live API
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GARMIN_PERSONAL_API_KEY: ${{ secrets.GARMIN_PERSONAL_API_KEY }}
+    steps:
+      - name: Skip without an API key
+        if: env.GARMIN_PERSONAL_API_KEY == ''
+        run: echo "::notice::Set the GARMIN_PERSONAL_API_KEY repository secret to enable live checks."
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.GARMIN_PERSONAL_API_KEY != ''
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        if: env.GARMIN_PERSONAL_API_KEY != ''
+        with:
+          enable-cache: true
+      - if: env.GARMIN_PERSONAL_API_KEY != ''
+        run: uv sync
+      - name: Live tests
+        if: env.GARMIN_PERSONAL_API_KEY != ''
+        # --tb=line keeps response values out of the log; messages only name fields.
+        run: uv run pytest -m live -q --tb=line -p no:cacheprovider
+      - name: Open or update an issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Live API checks are failing"
+          number=$(gh issue list --label api-drift --state open --search "in:title \"$title\"" --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "Still failing: $RUN_URL"
+          else
+            gh issue create --title "$title" --label api-drift --body "The live tests failed: $RUN_URL
+
+          Either Garmin changed the API (new fields, changed types, new limits) or the
+          GARMIN_PERSONAL_API_KEY secret expired. Run \`uv run pytest -m live\` locally."
+          fi

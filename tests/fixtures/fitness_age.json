@@ -1,0 +1,27 @@
+{
+  "chronologicalAge": 36,
+  "fitnessAge": 40.4,
+  "previousFitnessAge": 42.5,
+  "components": {
+    "bodyFat": {
+      "value": 25.4,
+      "stale": false,
+      "lastMeasurementDate": "2026-01-15"
+    },
+    "vigorousDaysAvg": {
+      "value": 1.9,
+      "stale": false,
+      "numOfWeeksForIm": 6
+    },
+    "rhr": {
+      "value": 41,
+      "stale": false
+    },
+    "vigorousMinutesAvg": {
+      "value": 98.4,
+      "stale": false,
+      "numOfWeeksForIm": 6
+    }
+  },
+  "lastUpdated": "2026-01-15T08:00:00.0"
+}

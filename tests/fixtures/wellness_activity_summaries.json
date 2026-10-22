@@ -1,0 +1,120 @@
+[
+  {
+    "userProfilePk": 24539089,
+    "activityUuid": {
+      "uuid": "00000000-0000-4000-8000-000000000000"
+    },
+    "calendarDate": "2026-01-15",
+    "rulePK": 2,
+    "activityName": "redacted",
+    "notes": null,
+    "wellnessActivityType": "HEALTH_MONITORING",
+    "startTimestampGMT": "2026-01-15T08:00:00.0",
+    "endTimestampGMT": "2026-01-15T08:00:00.722",
+    "startTimestampLocal": "2026-01-15T08:00:00.0",
+    "endTimestampLocal": "2026-01-15T08:00:00.722",
+    "summaryTypeDataList": [
+      {
+        "summaryType": "HEART_RATE",
+        "minValue": 79.8,
+        "maxValue": 62.8,
+        "avgValue": 78.4
+      },
+      {
+        "summaryType": "RESPIRATION",
+        "minValue": 11.7,
+        "maxValue": 21.4,
+        "avgValue": 10.8
+      },
+      {
+        "summaryType": "STRESS",
+        "minValue": 20.2,
+        "maxValue": 18.9,
+        "avgValue": 17.3
+      }
+    ],
+    "timeInZoneList": [
+      {
+        "zoneNumber": 0,
+        "millisInZone": 536043,
+        "zoneLowBoundary": 0
+      },
+      {
+        "zoneNumber": 1,
+        "millisInZone": 0,
+        "zoneLowBoundary": 48
+      },
+      {
+        "zoneNumber": 2,
+        "millisInZone": 0,
+        "zoneLowBoundary": 433
+      }
+    ],
+    "deviceMetaData": {
+      "deviceId": 4100723784,
+      "deviceTypeId": 28682,
+      "deviceVersionId": 2703277,
+      "deviceVersion": "redacted",
+      "deviceName": null
+    }
+  },
+  {
+    "userProfilePk": 24539089,
+    "activityUuid": {
+      "uuid": "00000000-0000-4000-8000-000000000000"
+    },
+    "calendarDate": "2026-01-15",
+    "rulePK": 2,
+    "activityName": "redacted",
+    "notes": null,
+    "wellnessActivityType": "HEALTH_MONITORING",
+    "startTimestampGMT": "2026-01-15T08:00:00.0",
+    "endTimestampGMT": "2026-01-15T08:00:00.231",
+    "startTimestampLocal": "2026-01-15T08:00:00.0",
+    "endTimestampLocal": "2026-01-15T08:00:00.231",
+    "summaryTypeDataList": [
+      {
+        "summaryType": "HEART_RATE",
+        "minValue": 28.0,
+        "maxValue": 96.8,
+        "avgValue": 64.1
+      },
+      {
+        "summaryType": "RESPIRATION",
+        "minValue": 9.1,
+        "maxValue": 9.8,
+        "avgValue": 17.0
+      },
+      {
+        "summaryType": "STRESS",
+        "minValue": 11.3,
+        "maxValue": 31.9,
+        "avgValue": 9.1
+      }
+    ],
+    "timeInZoneList": [
+      {
+        "zoneNumber": 0,
+        "millisInZone": 661399,
+        "zoneLowBoundary": 0
+      },
+      {
+        "zoneNumber": 1,
+        "millisInZone": 0,
+        "zoneLowBoundary": 17
+      },
+      {
+        "zoneNumber": 2,
+        "millisInZone": 0,
+        "zoneLowBoundary": 323
+      }
+    ],
+    "deviceMetaData": {
+      "deviceId": 4100723784,
+      "deviceTypeId": 28682,
+      "deviceVersionId": 2703277,
+      "deviceVersion": "redacted",
+      "deviceName": null
+    }
+  }
+]
