@@ -7,7 +7,24 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Thomas Camminady", email = "thomas@camminady.dev" }]
 requires-python = ">=3.11"
-keywords = ["garmin", "garmin-connect", "fitness", "health", "api-client", "pydantic", "httpx"]
+keywords = [
+    "garmin",
+    "garmin-connect",
+    "garmin-api",
+    "personal-api",
+    "api-client",
+    "fitness",
+    "health-data",
+    "fit-files",
+    "sleep",
+    "hrv",
+    "running",
+    "cycling",
+    "pydantic",
+    "httpx",
+    "asyncio",
+    "cli",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Framework :: AsyncIO",
