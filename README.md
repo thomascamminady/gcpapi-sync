@@ -7,7 +7,7 @@
 [![Docs](https://img.shields.io/badge/docs-pdoc-blue)](https://camminady.dev/gcpapi-sync/)
 ![Typed](https://img.shields.io/badge/typing-strict-brightgreen)
 
-A typed Python client and command line tool for the
+An unofficial typed Python client and command line tool for the
 [Garmin Connect Personal API](https://developer.garmin.com/gc-developer-program/personal/personal-faq/),
 the official API that gives you programmatic access to **your own** Garmin data:
 activities and their FIT files, sleep, heart rate, HRV, stress, Body Battery, SpO2,
