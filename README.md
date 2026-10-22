@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/gcpapi-sync)](https://pypi.org/project/gcpapi-sync/)
 [![CI](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/ci.yml)
 [![API drift](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/drift.yml/badge.svg)](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/drift.yml)
-[![Docs](https://img.shields.io/badge/docs-pdoc-blue)](https://thomascamminady.github.io/gcpapi-sync/)
+[![Docs](https://img.shields.io/badge/docs-pdoc-blue)](https://camminady.dev/gcpapi-sync/)
 ![Typed](https://img.shields.io/badge/typing-strict-brightgreen)
 
 A typed Python client and command line tool for the
@@ -50,7 +50,7 @@ uvx --from gcpapi-sync gcpapi today   # run the CLI without installing
 ```
 
 Requires Python 3.11 or newer. API documentation:
-[thomascamminady.github.io/gcpapi-sync](https://thomascamminady.github.io/gcpapi-sync/).
+[camminady.dev/gcpapi-sync](https://camminady.dev/gcpapi-sync/).
 
 ## Getting an API key
 

@@ -63,7 +63,7 @@ Personal API keys expire after at most a year; renew the secret before it does.
 
 API documentation is built with [pdoc](https://pdoc.dev) from the docstrings
 (Google style) and published to
-[thomascamminady.github.io/gcpapi-sync](https://thomascamminady.github.io/gcpapi-sync/)
+[camminady.dev/gcpapi-sync](https://camminady.dev/gcpapi-sync/)
 on every push to `main`. To preview it locally:
 
 ```bash

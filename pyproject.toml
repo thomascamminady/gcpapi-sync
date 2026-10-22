@@ -37,7 +37,7 @@ gcpapi = "gcpapi_sync.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/thomascamminady/gcpapi-sync"
-Documentation = "https://thomascamminady.github.io/gcpapi-sync/"
+Documentation = "https://camminady.dev/gcpapi-sync/"
 Repository = "https://github.com/thomascamminady/gcpapi-sync"
 Issues = "https://github.com/thomascamminady/gcpapi-sync/issues"
 Changelog = "https://github.com/thomascamminady/gcpapi-sync/blob/main/CHANGELOG.md"
