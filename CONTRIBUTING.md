@@ -70,14 +70,34 @@ on every push to `main`. To preview it locally:
 uv run --group docs pdoc gcpapi_sync gcpapi_sync.exceptions gcpapi_sync.cli --docformat google
 ```
 
-## Releases
+## Versioning and releases
 
-1. Update `version` in `pyproject.toml` (`uv version --bump minor`) and move the
-   `Unreleased` entries in `CHANGELOG.md` under the new version.
-2. Commit, then tag and push: `git tag v0.2.0 && git push origin v0.2.0`.
+Versions are `0.MINOR.YYYYMMDD`:
 
-The release workflow tests and builds the sdist and wheel, publishes them to
+- **`MINOR`** counts releases that change this package (features, fixes, internal
+  changes). It is bumped at most once per release.
+- **`YYYYMMDD`** is the date on which the current state of Garmin's API was picked
+  up. It changes only when Garmin changes something; our releases keep it.
+
+From `0.1.20261022`, a Garmin change the next week gives `0.1.20261029`; a change of
+ours gives `0.2.20261022` (or `0.2.20261029` after that Garmin change).
+`scripts/bump_version.py` applies these rules and updates `pyproject.toml`,
+`uv.lock` and `CHANGELOG.md`:
+
+```bash
+uv run scripts/bump_version.py feature --note "Add gcpapi plot"   # our change
+uv run scripts/bump_version.py garmin --note "New sleep fields"   # Garmin's change
+uv run scripts/bump_version.py show
+```
+
+The weekly API-drift pull requests run `garmin` themselves. Every pull request that
+changes the package should run `feature` (a test checks that `CHANGELOG.md` describes
+the version in `pyproject.toml`).
+
+**Releasing is merging.** When a new version reaches `main`, the release workflow tests
+and builds the sdist and wheel, publishes them to
 [PyPI](https://pypi.org/project/gcpapi-sync/) with
 [trusted publishing](https://docs.pypi.org/trusted-publishers/) (no API token is
-stored anywhere; PyPI trusts the `release.yml` workflow in the `pypi` environment),
-and attaches the same files to a GitHub release.
+stored anywhere; PyPI trusts `release.yml` in the `pypi` environment, which only
+deploys from `main`), then creates the `v<version>` tag and a GitHub release with the
+same files. Versions that already have a tag are skipped.

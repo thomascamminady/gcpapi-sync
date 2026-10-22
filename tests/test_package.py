@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import inspect
 import re
+import tomllib
+from datetime import UTC, datetime, timedelta
 from importlib import resources
 from pathlib import Path
 
@@ -14,7 +16,8 @@ import gcpapi_sync
 from gcpapi_sync import AsyncGarminClient, GarminClient
 from tests.cases import CASES, NOT_ENDPOINTS, Case
 
-SPEC = Path(__file__).parent.parent / "spec" / "endpoints.json"
+ROOT = Path(__file__).parent.parent
+SPEC = ROOT / "spec" / "endpoints.json"
 
 
 class SpecParameter(BaseModel):
@@ -47,7 +50,30 @@ def public_methods(cls: type) -> dict[str, inspect.Signature]:
 def test_public_names_are_importable() -> None:
     for name in gcpapi_sync.__all__:
         assert getattr(gcpapi_sync, name) is not None, name
-    assert re.match(r"^\d+\.\d+\.\d+", gcpapi_sync.__version__)
+
+
+def project_version() -> str:
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    return str(project["version"])
+
+
+def test_version_is_0_minor_garmin_date() -> None:
+    """Versions are 0.MINOR.YYYYMMDD (see scripts/bump_version.py)."""
+    version = project_version()
+    match = re.fullmatch(r"0\.(?P<minor>\d+)\.(?P<day>\d{8})", version)
+    assert match is not None, f"{version} is not 0.MINOR.YYYYMMDD"
+    day = datetime.strptime(match["day"], "%Y%m%d").replace(tzinfo=UTC).date()
+    assert day <= datetime.now(UTC).date() + timedelta(days=1), "the date lies in the future"
+    assert int(match["minor"]) >= 1
+    assert gcpapi_sync.__version__ == version
+
+
+def test_changelog_describes_this_version() -> None:
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    top = re.search(r"^## \[(?P<version>[^\]]+)\] - \d{4}-\d{2}-\d{2}$", changelog, re.MULTILINE)
+
+    assert top is not None, "CHANGELOG.md has no version section"
+    assert top["version"] == project_version(), "run scripts/bump_version.py to update it"
 
 
 def test_package_is_typed() -> None:

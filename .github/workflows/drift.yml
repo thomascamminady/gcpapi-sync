@@ -1,8 +1,9 @@
 name: API drift
 
 # Detects changes to Garmin's Personal API:
-#  * spec:  regenerates the models from Garmin's published OpenAPI document and opens
-#           a pull request when anything changed.
+#  * spec:  regenerates the models from Garmin's published OpenAPI document and, when
+#           anything changed, opens a pull request that also sets the version's date
+#           component (0.MINOR.YYYYMMDD) to today. Merging it publishes the release.
 #  * live:  runs the live tests (needs the GARMIN_PERSONAL_API_KEY repository secret)
 #           and opens an issue when the real API no longer matches the models.
 
@@ -32,6 +33,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true # bump_version.py compares with the released versions
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
@@ -51,6 +54,14 @@ jobs:
             git diff --stat | tee "$RUNNER_TEMP/diffstat.txt"
           fi
 
+      - name: Bump the version (Garmin changed, so only the date moves)
+        id: bump
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          uv run scripts/bump_version.py garmin --note "Models regenerated from Garmin's OpenAPI document of $(date -u +%Y-%m-%d)."
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
       - name: Run every check against the regenerated code
         id: checks
         if: steps.diff.outputs.changed == 'true'
@@ -69,10 +80,12 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         env:
           OUTCOME: ${{ steps.checks.outcome }}
+          VERSION: ${{ steps.bump.outputs.version }}
         run: |
           {
             echo "Garmin's published OpenAPI document changed. This pull request regenerates"
-            echo "\`src/gcpapi_sync/models/_generated.py\` and \`spec/endpoints.json\`."
+            echo "\`src/gcpapi_sync/models/_generated.py\` and \`spec/endpoints.json\` and sets"
+            echo "the version to **${VERSION}**. Merging it publishes that release to PyPI."
             echo
             echo "**Checks on the regenerated code: ${OUTCOME}**"
             echo
@@ -99,7 +112,7 @@ jobs:
         with:
           branch: automation/api-drift
           delete-branch: true
-          title: "Garmin's Personal API spec changed"
+          title: "Garmin's Personal API changed (${{ steps.bump.outputs.version }})"
           commit-message: "Regenerate models from Garmin's current OpenAPI document"
           body-path: ${{ runner.temp }}/body.md
           labels: api-drift
