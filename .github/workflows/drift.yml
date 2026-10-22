@@ -128,8 +128,9 @@ jobs:
         run: uv sync
       - name: Live tests
         if: env.GARMIN_PERSONAL_API_KEY != ''
-        # --tb=line keeps response values out of the log; messages only name fields.
-        run: uv run pytest -m live -q --tb=line -p no:cacheprovider
+        # This log is public: no tracebacks, no captured output; test messages name
+        # fields at most (see tests/live/test_live.py).
+        run: uv run pytest -m live -q --tb=no --show-capture=no -p no:cacheprovider
       - name: Open or update an issue
         if: failure()
         env:

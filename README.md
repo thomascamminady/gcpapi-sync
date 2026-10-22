@@ -1,8 +1,10 @@
 # gcpapi-sync
 
+[![PyPI](https://img.shields.io/pypi/v/gcpapi-sync)](https://pypi.org/project/gcpapi-sync/)
+[![Python](https://img.shields.io/pypi/pyversions/gcpapi-sync)](https://pypi.org/project/gcpapi-sync/)
 [![CI](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/ci.yml)
 [![API drift](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/drift.yml/badge.svg)](https://github.com/thomascamminady/gcpapi-sync/actions/workflows/drift.yml)
-![Python 3.11 | 3.12 | 3.13 | 3.14](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)
+[![Docs](https://img.shields.io/badge/docs-pdoc-blue)](https://thomascamminady.github.io/gcpapi-sync/)
 ![Typed](https://img.shields.io/badge/typing-strict-brightgreen)
 
 A typed Python client and command line tool for the
@@ -11,7 +13,6 @@ the official API that gives you programmatic access to **your own** Garmin data:
 activities and their FIT files, sleep, heart rate, HRV, stress, Body Battery, SpO2,
 steps, weight, nutrition and more.
 
-> [!IMPORTANT]
 > **Disclaimer.** This is a personal, private project. It is not affiliated with,
 > endorsed by, or developed on behalf of my employer, Wahoo Fitness, and it is not
 > affiliated with or endorsed by Garmin. "Garmin" and "Garmin Connect" are trademarks
@@ -23,7 +24,7 @@ steps, weight, nutrition and more.
 - **Every endpoint**, as typed methods on a sync `GarminClient` and an async
   `AsyncGarminClient` with identical signatures.
 - **109 pydantic models**, generated from Garmin's OpenAPI document and *corrected
-  where the live API contradicts it* (see [API quirks](#api-quirks)). No `dict`, no
+  where the live API contradicts it* (see [API quirks](https://github.com/thomascamminady/gcpapi-sync#api-quirks)). No `dict`, no
   `Any`: maps with known keys are models, intraday series have typed accessors.
 - **Strictly typed** (`py.typed`), checked with `ty` (every rule as an error) and
   `mypy --strict`, with no suppression comments anywhere in the code base.
@@ -41,15 +42,15 @@ steps, weight, nutrition and more.
 
 ## Installation
 
-The package is not on PyPI yet; install it from GitHub:
-
 ```bash
-uv add git+https://github.com/thomascamminady/gcpapi-sync      # in a uv project
-pip install git+https://github.com/thomascamminady/gcpapi-sync  # with pip
-uv tool install git+https://github.com/thomascamminady/gcpapi-sync  # just the CLI
+uv add gcpapi-sync          # in a uv project
+pip install gcpapi-sync     # with pip
+uv tool install gcpapi-sync # just the gcpapi command
+uvx --from gcpapi-sync gcpapi today   # run the CLI without installing
 ```
 
-Requires Python 3.11 or newer.
+Requires Python 3.11 or newer. API documentation:
+[thomascamminady.github.io/gcpapi-sync](https://thomascamminady.github.io/gcpapi-sync/).
 
 ## Getting an API key
 
@@ -286,9 +287,9 @@ uv run scripts/generate_models.py                 # fetch Garmin's current spec 
 uv run scripts/scrub_fixture.py response.json tests/fixtures/name.json   # anonymize a fixture
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and how API drift is
-detected.
+See [CONTRIBUTING.md](https://github.com/thomascamminady/gcpapi-sync/blob/main/CONTRIBUTING.md)
+for the full workflow and how API drift is detected.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/thomascamminady/gcpapi-sync/blob/main/LICENSE)

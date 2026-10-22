@@ -7,7 +7,11 @@ Skipped by default. Run with a key configured (``gcpapi setup`` or
 
 Besides calling every endpoint, these tests fail when Garmin returns fields the
 models do not know, which is how changes to the API that the spec does not announce
-are detected. Assertion messages name fields, never values.
+are detected.
+
+These tests run in public CI logs, so they must never print personal data: every
+check goes through :func:`check`, whose failure message is fixed text (field names
+at most), and plain ``assert`` is not used because pytest would print the values.
 """
 
 from __future__ import annotations
@@ -42,6 +46,12 @@ def activity_id(garmin: GarminClient) -> int:
     if not activities or activities[0].activity_id is None:
         pytest.skip("the account has no activities")
     return activities[0].activity_id
+
+
+def check(condition: bool, message: str) -> None:
+    """Fail with ``message`` only, without pytest's introspection of the values."""
+    if not condition:
+        pytest.fail(message, pytrace=False)
 
 
 def undocumented(value: object, prefix: str = "") -> set[str]:
@@ -100,8 +110,9 @@ CALLS: dict[str, Callable[[GarminClient], object]] = {
 def test_endpoint(garmin: GarminClient, name: str) -> None:
     result = CALLS[name](garmin)
 
-    assert result is None or isinstance(result, GarminModel | list)
-    assert not undocumented(result), f"{name} returned fields the models do not know"
+    check(result is None or isinstance(result, GarminModel | list), f"{name}: unexpected type")
+    unknown = undocumented(result)
+    check(not unknown, f"{name} returned fields the models do not know: {sorted(unknown)}")
 
 
 def test_activity_endpoints(garmin: GarminClient, activity_id: int) -> None:
@@ -109,11 +120,12 @@ def test_activity_endpoints(garmin: GarminClient, activity_id: int) -> None:
     workouts = garmin.get_activity_workouts(activity_id)
     download = garmin.download_activity(activity_id)
 
-    assert activity.activity_id == activity_id
-    assert isinstance(workouts, list)
-    assert isinstance(download, ActivityFile)
-    assert download.content
-    assert not undocumented(activity) | undocumented(workouts)
+    check(activity.activity_id == activity_id, "get_activity returned a different activity")
+    check(isinstance(workouts, list), "get_activity_workouts did not return a list")
+    check(isinstance(download, ActivityFile), "download_activity did not return a file")
+    check(len(download.content) > 0, "download_activity returned an empty file")
+    unknown = undocumented(activity) | undocumented(workouts)
+    check(not unknown, f"activity endpoints returned unknown fields: {sorted(unknown)}")
 
 
 def test_iterating_activities_matches_search(garmin: GarminClient) -> None:
@@ -124,7 +136,7 @@ def test_iterating_activities_matches_search(garmin: GarminClient) -> None:
         a.activity_id for a in garmin.search_activities(start_date=since, limit=len(iterated) + 5)
     ]
 
-    assert iterated == searched
+    check(iterated == searched, "iter_activities and search_activities disagree")
 
 
 def test_ranges_are_contiguous(garmin: GarminClient) -> None:
@@ -133,10 +145,10 @@ def test_ranges_are_contiguous(garmin: GarminClient) -> None:
     steps = garmin.get_daily_steps(start, YESTERDAY)
 
     days = [item.calendar_date for item in steps if item.calendar_date is not None]
-    assert len(days) == len(steps)
-    assert days == sorted(days)
-    assert len(days) == len(set(days))
-    assert days[0] == start
+    check(len(days) == len(steps), "some daily steps have no calendar date")
+    check(days == sorted(days), "windows are not returned in order")
+    check(len(days) == len(set(days)), "windows overlap")
+    check(days[0] == start, "the first window does not start at the requested date")
 
 
 def test_typed_series(garmin: GarminClient) -> None:
@@ -144,8 +156,9 @@ def test_typed_series(garmin: GarminClient) -> None:
 
     samples = heart_rate.heart_rate_samples()
 
-    assert all(sample.timestamp.tzinfo is UTC for sample in samples)
-    assert samples == sorted(samples, key=lambda sample: sample.timestamp)
+    check(all(sample.timestamp.tzinfo is UTC for sample in samples), "timestamps are not UTC")
+    in_order = samples == sorted(samples, key=lambda sample: sample.timestamp)
+    check(in_order, "heart rate samples are not in chronological order")
 
 
 def test_server_still_rejects_oversized_requests(garmin: GarminClient) -> None:
@@ -162,16 +175,17 @@ def test_weight_entries_endpoint_status(garmin: GarminClient) -> None:
         entries = garmin.get_weight_entries(WEEK_AGO, YESTERDAY)
     except BadRequestError:
         pytest.xfail("Garmin still answers /weight-service/weight/all with HTTP 400")
-    assert not undocumented(entries)
+    unknown = undocumented(entries)
+    check(not unknown, f"weight entries returned unknown fields: {sorted(unknown)}")
 
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("anyio_backend", ["asyncio"])
 async def test_async_client(anyio_backend: str) -> None:
-    assert anyio_backend == "asyncio"
+    check(anyio_backend == "asyncio", "unexpected backend")
     async with AsyncGarminClient() as garmin:
         steps = await garmin.get_daily_steps(TODAY - timedelta(days=90), YESTERDAY)
         sleep = await garmin.get_daily_sleep(YESTERDAY)
 
-    assert len(steps) >= 80
-    assert isinstance(sleep, models.DailySleep)
+    check(len(steps) >= 80, "the async client returned too few days")
+    check(isinstance(sleep, models.DailySleep), "get_daily_sleep returned an unexpected type")

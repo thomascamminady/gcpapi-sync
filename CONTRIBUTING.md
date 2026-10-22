@@ -62,22 +62,22 @@ Personal API keys expire after at most a year; renew the secret before it does.
 ## Documentation
 
 API documentation is built with [pdoc](https://pdoc.dev) from the docstrings
-(Google style):
+(Google style) and published to
+[thomascamminady.github.io/gcpapi-sync](https://thomascamminady.github.io/gcpapi-sync/)
+on every push to `main`. To preview it locally:
 
 ```bash
 uv run --group docs pdoc gcpapi_sync gcpapi_sync.exceptions gcpapi_sync.cli --docformat google
 ```
 
-CI builds it on every push and publishes it to GitHub Pages from `main` when Pages is
-enabled for the repository (Settings → Pages → Source: GitHub Actions; for a private
-repository this needs a plan that includes Pages).
-
 ## Releases
 
-1. Update `version` in `pyproject.toml` and `CHANGELOG.md`.
-2. Tag and push: `git tag v0.2.0 && git push --tags`.
+1. Update `version` in `pyproject.toml` (`uv version --bump minor`) and move the
+   `Unreleased` entries in `CHANGELOG.md` under the new version.
+2. Commit, then tag and push: `git tag v0.2.0 && git push origin v0.2.0`.
 
-The release workflow builds the sdist and wheel and attaches them to a GitHub
-release. Publishing to PyPI is intentionally not set up yet; when it is, use
-[trusted publishing](https://docs.pypi.org/trusted-publishers/) rather than an API
-token.
+The release workflow tests and builds the sdist and wheel, publishes them to
+[PyPI](https://pypi.org/project/gcpapi-sync/) with
+[trusted publishing](https://docs.pypi.org/trusted-publishers/) (no API token is
+stored anywhere; PyPI trusts the `release.yml` workflow in the `pypi` environment),
+and attaches the same files to a GitHub release.
