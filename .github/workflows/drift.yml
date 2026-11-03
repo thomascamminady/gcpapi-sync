@@ -143,7 +143,17 @@ jobs:
         if: env.GARMIN_PERSONAL_API_KEY != ''
         # This log is public: no tracebacks, no captured output; test messages name
         # fields at most (see tests/live/test_live.py).
-        run: uv run pytest -m live -q --tb=no --show-capture=no -p no:cacheprovider
+        run: |
+          set -o pipefail
+          uv run pytest -m live -q -rs --tb=no --show-capture=no -p no:cacheprovider \
+            | tee "$RUNNER_TEMP/live.log"
+      - name: Report Garmin's outages
+        # An endpoint whose server fails is skipped (tests/live/conftest.py): a warning
+        # here, not a failure, since the API did not change.
+        if: always() && env.GARMIN_PERSONAL_API_KEY != ''
+        run: |
+          grep -oE "[][a-z_]+: Garmin's server answered HTTP [0-9]+" "$RUNNER_TEMP/live.log" \
+            | while read -r outage; do echo "::warning title=Outage at Garmin::$outage"; done || true
       - name: Open or update an issue
         if: failure()
         env:
