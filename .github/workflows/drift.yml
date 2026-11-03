@@ -26,6 +26,9 @@ jobs:
   spec:
     name: Compare with Garmin's published spec
     runs-on: ubuntu-latest
+    outputs:
+      pull-request: ${{ steps.pr.outputs.pull-request-number }}
+      checks: ${{ steps.checks.outcome }}
     permissions:
       contents: write
       pull-requests: write
@@ -107,6 +110,7 @@ jobs:
           } > "$RUNNER_TEMP/body.md"
 
       - name: Open or update the pull request
+        id: pr
         if: steps.diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
@@ -117,9 +121,32 @@ jobs:
           body-path: ${{ runner.temp }}/body.md
           labels: api-drift
 
+  merge:
+    name: Check and merge the pull request
+    # A pull request opened with the workflow's token starts no workflows: start CI on its
+    # branch, and let it merge once every check passes. Only when the regenerated code passed
+    # every check here; otherwise it waits for a person.
+    needs: spec
+    if: needs.spec.outputs.pull-request != '' && needs.spec.outputs.checks == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR: ${{ needs.spec.outputs.pull-request }}
+    steps:
+      - run: |
+          gh workflow run ci.yml --ref automation/api-drift
+          gh pr merge "$PR" --auto --squash
+
   live:
     name: Check the live API
     runs-on: ubuntu-latest
+    outputs:
+      checked: ${{ steps.live.outcome }}
     permissions:
       contents: read
       issues: write
@@ -140,6 +167,7 @@ jobs:
       - if: env.GARMIN_PERSONAL_API_KEY != ''
         run: uv sync
       - name: Live tests
+        id: live
         if: env.GARMIN_PERSONAL_API_KEY != ''
         # This log is public: no tracebacks, no captured output; test messages name
         # fields at most (see tests/live/test_live.py).
@@ -170,3 +198,21 @@ jobs:
           Either Garmin changed the API (new fields, changed types, new limits) or the
           GARMIN_PERSONAL_API_KEY secret expired. Run \`uv run pytest -m live\` locally."
           fi
+
+  close:
+    name: Close the issue once the checks pass
+    needs: live
+    if: needs.live.outputs.checked == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - run: |
+          gh issue list --label api-drift --state open --json number --jq '.[].number' \
+            | while read -r number; do
+              gh issue close "$number" --comment "The live checks pass again: $RUN_URL"
+            done

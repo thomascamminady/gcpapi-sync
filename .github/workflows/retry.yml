@@ -1,0 +1,28 @@
+name: Retry
+
+# Every hour, CI runs of the last day that failed run their failed jobs once more: GitHub's
+# runners sometimes never take a job, and a pull request should not wait for a person to
+# press the button. A run that fails again stays failed.
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  retry:
+    name: Run failed jobs once more
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - run: |
+          gh run list --workflow ci.yml --status failure --limit 50 \
+            --json databaseId,attempt,createdAt \
+            --jq '.[] | select(.attempt == 1 and (.createdAt | fromdateiso8601) > now - 86400) | .databaseId' \
+            | while read -r run; do gh run rerun "$run" --failed; done

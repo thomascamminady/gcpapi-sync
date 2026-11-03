@@ -13,6 +13,10 @@ on:
     branches: [main]
     paths: [pyproject.toml]
   workflow_dispatch:
+  # Merges made by the workflows' own token (Dependabot's, the drift job's) start no
+  # workflows, so the release also looks every day for a version on main not yet released.
+  schedule:
+    - cron: "17 6 * * *"
 
 permissions:
   contents: read
