@@ -33,8 +33,9 @@ MAX_DAYS_DAILY_SUMMARIES: Final = 31
 MAX_DAYS_HRV: Final = 365
 
 # The activity search fails with HTTP 500 for pages larger than about 45 activities,
-# including the server's own default of 99. The client always sends an explicit limit.
-DEFAULT_ACTIVITY_PAGE_SIZE: Final = 20
+# including the server's own default of 99. The client always sends an explicit limit, and
+# pages by the most the server answers: Garmin answers a key at most 100 requests a minute.
+DEFAULT_ACTIVITY_LIMIT: Final = 20
 MAX_ACTIVITY_PAGE_SIZE: Final = 45
 
 # Refuse to decompress implausibly large activity archives.
