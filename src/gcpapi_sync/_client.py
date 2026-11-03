@@ -10,7 +10,7 @@ import httpx
 
 from . import _endpoints as ep
 from ._constants import (
-    DEFAULT_ACTIVITY_PAGE_SIZE,
+    DEFAULT_ACTIVITY_LIMIT,
     DEFAULT_TIMEOUT,
     MAX_ACTIVITY_PAGE_SIZE,
     MAX_DAYS_BODY_BATTERY,
@@ -258,7 +258,7 @@ class GarminClient(BaseClient):
         self,
         *,
         start: int = 0,
-        limit: int = DEFAULT_ACTIVITY_PAGE_SIZE,
+        limit: int = DEFAULT_ACTIVITY_LIMIT,
         **filters: Unpack[ActivityFilters],
     ) -> list[SummarizedActivity]:
         """Return up to ``limit`` activities matching ``filters``, newest first by default.
@@ -275,7 +275,7 @@ class GarminClient(BaseClient):
         params = ep.activity_filter_params(filters)
         activities: list[SummarizedActivity] = []
         while len(activities) < limit:
-            size = min(limit - len(activities), DEFAULT_ACTIVITY_PAGE_SIZE)
+            size = min(limit - len(activities), MAX_ACTIVITY_PAGE_SIZE)
             page = self._request(ep.search_activities(start + len(activities), size, params))
             activities.extend(page)
             if len(page) < size:
@@ -286,7 +286,7 @@ class GarminClient(BaseClient):
         self,
         *,
         start: int = 0,
-        page_size: int = DEFAULT_ACTIVITY_PAGE_SIZE,
+        page_size: int = MAX_ACTIVITY_PAGE_SIZE,
         **filters: Unpack[ActivityFilters],
     ) -> Iterator[SummarizedActivity]:
         """Iterate over all activities matching ``filters``, fetching pages lazily.

@@ -7,6 +7,12 @@ Versions are `0.MINOR.YYYYMMDD`: `MINOR` is bumped when this package changes, an
 date records when the current state of Garmin's API was picked up (it changes only
 when Garmin changes something). `scripts/bump_version.py` computes the next version.
 
+## [0.2.20261022] - 2026-11-03
+
+### Changed
+
+- Search activities 45 to a request, the most Garmin answers at once, instead of 20: half the requests against Garmin's 100 a minute
+
 ## [0.1.20261022] - 2026-10-22
 
 ### Added

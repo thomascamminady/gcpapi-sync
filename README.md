@@ -115,7 +115,7 @@ Dates are `datetime.date` objects or `YYYY-MM-DD` strings; ranges are inclusive.
 | Method | Returns | Garmin's limit per request |
 | --- | --- | --- |
 | `search_activities(start=0, limit=20, **filters)` | `list[SummarizedActivity]` | ~45 per page (paged for you) |
-| `iter_activities(page_size=20, **filters)` | iterator of `SummarizedActivity` | |
+| `iter_activities(page_size=45, **filters)` | iterator of `SummarizedActivity` | |
 | `get_activity(activity_id)` | `ActivitySummary` | |
 | `get_activity_workouts(activity_id)` | `list[ActivityWorkout]` | |
 | `download_activity(activity_id)` | `ActivityFile` (original FIT/GPX/TCX) | |

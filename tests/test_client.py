@@ -218,25 +218,25 @@ def test_search_pages_large_limits(harness: Harness) -> None:
 
     harness.fake.respond_with(SEARCH, reply)
 
-    result = harness.call("search_activities", limit=45, activity_type="running")
+    result = harness.call("search_activities", limit=100, activity_type="running")
 
     assert isinstance(result, list)
-    assert len(result) == 45
+    assert len(result) == 100
     assert [(r.url.params["start"], r.url.params["limit"]) for r in harness.fake.data_requests] == [
-        ("0", "20"),
-        ("20", "20"),
-        ("40", "5"),
+        ("0", "45"),
+        ("45", "45"),
+        ("90", "10"),
     ]
     assert all(r.url.params["activityType"] == "running" for r in harness.fake.data_requests)
 
 
 def test_search_stops_at_the_last_page(harness: Harness) -> None:
-    harness.fake.reply(SEARCH, Reply.json(activities(20)), Reply.json(activities(3, 20)))
+    harness.fake.reply(SEARCH, Reply.json(activities(45)), Reply.json(activities(3, 45)))
 
     result = harness.call("search_activities", start=0, limit=100)
 
     assert isinstance(result, list)
-    assert len(result) == 23
+    assert len(result) == 48
     assert len(harness.fake.data_requests) == 2
 
 
